@@ -5,6 +5,7 @@ import { useParams } from "react-router-dom";
 import api from "../../assets/api";
 import ViewProof from "./ViewProof";
 import { Tooltip } from "@mui/material";
+import Swal from "sweetalert2";
 
 function ComitteeTable() {
   const { id, name } = useParams();
@@ -16,8 +17,6 @@ function ComitteeTable() {
       .get(`/api/committee/${id}/${name}/payments/`)
       .then((res) => {
         setPayments(res.data.payments);
-
-        // Fetch latest feedback for each payment
         res.data.payments.forEach((p) => {
           api
             .get(`/api/payments/${p.id}/latest-feedback/`)
@@ -37,6 +36,34 @@ function ComitteeTable() {
       })
       .catch(() => setPayments([]));
   }, [id, name]);
+
+  const handleDelete = (paymentId) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "This action cannot be undone!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, delete it!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        api
+          .delete(`/api/payments/${paymentId}/delete/`)
+          .then(() => {
+            setPayments((prev) => prev.filter((p) => p.id !== paymentId));
+            Swal.fire("Deleted!", "The payment has been deleted.", "success");
+          })
+          .catch(() => {
+            Swal.fire(
+              "Error!",
+              "There was an error deleting the payment.",
+              "error"
+            );
+          });
+      }
+    });
+  };
 
   return (
     <>
@@ -118,7 +145,6 @@ function ComitteeTable() {
                       "No feedback yet"
                     )}
                   </td>
-
                   <td className="p-4 text-[15px] text-slate-600 font-medium">
                     {p.date_issued
                       ? new Date(p.date_issued)
@@ -127,7 +153,7 @@ function ComitteeTable() {
                             day: "numeric",
                             year: "numeric",
                           })
-                          .replace(/,/g, "") // removes the comma after month
+                          .replace(/,/g, "")
                       : ""}
                   </td>
                   <td className="p-4">
@@ -138,7 +164,7 @@ function ComitteeTable() {
                           onFeedbackSaved={(newFeedback) => {
                             setFeedbacks((prev) => ({
                               ...prev,
-                              [p.id]: newFeedback, // instantly update latest feedback for this payment
+                              [p.id]: newFeedback,
                             }));
                           }}
                         />
@@ -146,6 +172,7 @@ function ComitteeTable() {
                       <div
                         className="cursor-pointer text-red-500"
                         title="Delete"
+                        onClick={() => handleDelete(p.id)}
                       >
                         <DeleteOutlineIcon />
                       </div>

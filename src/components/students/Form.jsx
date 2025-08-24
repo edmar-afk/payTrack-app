@@ -105,7 +105,6 @@ function Form({ user, selected }) {
       formData.append("proof", file);
       formData.append("payment", committee?.amount || "");
       formData.append("student", user.id);
-      formData.append("status", "Pending");
 
       await api.post(`/api/payment/${user.id}/${selected}/`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
@@ -122,6 +121,13 @@ function Form({ user, selected }) {
       setLoading(false);
     }
   };
+
+  console.log(
+    "Submitting payment for student:",
+    user.id,
+    "committee:",
+    selected
+  );
 
   return (
     <form className="mt-12" onSubmit={(e) => e.preventDefault()}>

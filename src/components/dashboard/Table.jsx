@@ -135,8 +135,18 @@ function Table({ type }) {
                   </td>
                   <td className="p-4 text-[15px] text-slate-600 font-medium">
                     <div className="flex-col">
-                      <p> {item.deadline}</p>
-                      <p className="text-xs"> {getDeadlineStatus(item.deadline)}</p>
+                      <p>
+                        {new Date(item.deadline)
+                          .toLocaleDateString("en-US", {
+                            month: "short",
+                            day: "numeric",
+                            year: "numeric",
+                          })
+                          .replace(",", ".")}
+                      </p>
+                      <p className="text-xs">
+                        {getDeadlineStatus(item.deadline)}
+                      </p>
                     </div>
                   </td>
                   {type !== "Dashboard" && (

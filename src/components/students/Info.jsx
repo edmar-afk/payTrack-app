@@ -96,7 +96,7 @@ function Info({ selected, user }) {
             {payments.length === 0 ? (
               <p className="mt-2 text-slate-500">No payments yet</p>
             ) : (
-              <ul className="mt-2 space-y-4">
+              <ul className="mt-24 space-y-4">
                 {payments.map((p) => {
                   const status = latestFeedbacks[p.id] || "Pending";
                   const stamp = getStamp(status);
@@ -122,7 +122,7 @@ function Info({ selected, user }) {
                         <img
                           src={stamp}
                           alt={status}
-                          className="absolute top-2 right-2 w-20 opacity-80"
+                          className="absolute top-1/2 left-1/2 w-full opacity-80 -translate-x-1/2 -translate-y-1/2"
                         />
                       )}
                     </li>
