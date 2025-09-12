@@ -1,7 +1,8 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from "react";
 import api from "../../assets/api";
 
-function Form({ user, selected }) {
+function Form({ user, selected, semester }) {
   const [profile, setProfile] = useState(null);
   const [file, setFile] = useState(null);
   const [error, setError] = useState("");
@@ -103,10 +104,10 @@ function Form({ user, selected }) {
     try {
       const formData = new FormData();
       formData.append("proof", file);
-      formData.append("payment", committee?.amount || "");
-      formData.append("student", user.id);
+      formData.append("payment", selected);
+      formData.append("semester", semester || "");
 
-      await api.post(`/api/payment/${user.id}/${selected}/`, formData, {
+      await api.post(`/api/submit-payment/${user.id}/`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
@@ -122,12 +123,14 @@ function Form({ user, selected }) {
     }
   };
 
-  console.log(
-    "Submitting payment for student:",
-    user.id,
-    "committee:",
-    selected
-  );
+  // console.log(
+  //   "Submitting payment for student:",
+  //   user.id,
+  //   "committee:",
+  //   selected,
+  //   "semester:",
+  //   semester
+  // );
 
   return (
     <form className="mt-12" onSubmit={(e) => e.preventDefault()}>

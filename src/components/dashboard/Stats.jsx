@@ -1,14 +1,55 @@
+import { useEffect, useState } from "react";
 import PeopleOutlineIcon from "@mui/icons-material/PeopleOutline";
 import Tooltip from "@mui/material/Tooltip";
+import api from "../../assets/api";
 
 function Stats() {
-  const payments = [
-    { title: "PTA", amount: "₱123,456.00", subtitle: "Total Paid", count: 12 },
-    { title: "QAA", amount: "₱78,900.00", subtitle: "Total Paid", count: 8 },
-    { title: "LAC", amount: "₱45,600.00", subtitle: "Total Paid", count: 15 },
-    { title: "CF", amount: "₱67,800.00", subtitle: "Total Paid", count: 20 },
-    { title: "RHC", amount: "₱12,345.00", subtitle: "Total Paid", count: 5 },
-  ];
+  const [payments, setPayments] = useState([
+    { title: "PTA" },
+    { title: "QAA" },
+    { title: "LAC" },
+    { title: "CF" },
+    { title: "RHC" },
+  ]);
+
+  useEffect(() => {
+    const fetchTotals = async () => {
+      const updatedPayments = await Promise.all(
+        payments.map(async (item) => {
+          try {
+            console.log("Fetching for committee:", item.title);
+            const res = await api.get(`/api/total-amount/${item.title}/`);
+            console.log("API response for", item.title, ":", res.data);
+
+            const total = parseFloat(res.data.total_amount || 0);
+            const count = res.data.count || 0;
+
+            console.log(`Parsed total for ${item.title}:`, total);
+
+            return {
+              ...item,
+              amount: total,
+              count: count,
+            };
+          } catch (err) {
+            console.error("Error fetching total for", item.title, err);
+            return { ...item, amount: 0, count: 0 };
+          }
+        })
+      );
+
+      console.log("Updated payments:", updatedPayments);
+      setPayments(updatedPayments);
+    };
+
+    fetchTotals();
+  }, []);
+
+  const totalAmount = payments.reduce(
+    (acc, item) => acc + (item.amount || 0),
+    0
+  );
+  console.log("Total amount:", totalAmount);
 
   return (
     <div className="flex flex-col bg-gradient-to-tr from-green-900 to-green-500 p-4 rounded-xl text-white">
@@ -16,7 +57,10 @@ function Stats() {
         <p className="text-lg">Payment Informations</p>
         <p>As of Aug. 20, 2025</p>
       </div>
-      <p className="text-4xl font-bold">₱999,999.00</p>
+
+      <p className="text-4xl font-bold">
+        ₱{totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+      </p>
       <p className="text-sm opacity-80">Total Amount</p>
 
       <div className="flex flex-row mt-8 flex-wrap justify-start gap-4">
@@ -28,8 +72,12 @@ function Stats() {
             <div className="flex flex-row items-end justify-between">
               <div>
                 <p className="text-lg font-extrabold">{item.title}</p>
-                <p className="pt-2">{item.amount}</p>
-                <p className="text-xs">{item.subtitle}</p>
+                <p className="pt-2">
+                  ₱
+                  {(item.amount || 0).toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                  })}
+                </p>
               </div>
 
               <Tooltip

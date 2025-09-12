@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Modal, Box, Typography, IconButton, Button } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-const BASE_URL = import.meta.env.VITE_API_URL;
 const style = {
   position: "absolute",
   top: "50%",
@@ -41,8 +40,7 @@ function ViewProof({ student, imageUrl }) {
             mb={2}
           >
             <Typography variant="h6">
-              Viewing proof of payment for {student.last_name},{" "}
-              {student.first_name}
+              Viewing proof of payment for {student}
             </Typography>
             <IconButton onClick={handleClose}>
               <CloseIcon />
@@ -50,8 +48,8 @@ function ViewProof({ student, imageUrl }) {
           </Box>
           <Box
             component="img"
-            src={`${BASE_URL}${imageUrl}`}
-            alt={`Proof of ${student.first_name} ${student.last_name}`}
+            src={imageUrl}
+            alt={`Proof of ${student}`}
             sx={{
               width: "100%",
               height: "auto",

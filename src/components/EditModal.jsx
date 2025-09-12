@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { useState } from "react";
 import {
   Modal,
@@ -16,37 +17,63 @@ import api from "../assets/api";
 function EditModal({ paymentId, onFeedbackSaved }) {
   const [open, setOpen] = useState(false);
   const [status, setStatus] = useState("Pending");
-  const [reason, setReason] = useState("");
+  const [feedback, setFeedback] = useState("");
+  const [paymentNumber, setPaymentNumber] = useState("");
+  const [paymentType, setPaymentType] = useState("");
 
-  const handleOpen = () => setOpen(true);
+  const handleOpen = async () => {
+    try {
+      const res = await api.get(`/api/payments/${paymentId}/`);
+      const payment = res.data;
+
+      setStatus(payment.status || "Pending");
+      setFeedback(payment.feedback || "");
+      setPaymentType(payment.comittee_name || "");
+      setPaymentNumber(
+        payment.amount
+          ? payment.amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+          : ""
+      );
+
+      setOpen(true);
+    } catch (error) {
+      Swal.fire("Error!", "Failed to fetch payment details.", "error");
+    }
+  };
+
   const handleClose = () => setOpen(false);
-  const handleChange = (event) => setStatus(event.target.value);
+
+  const handleNumberChange = (e) => {
+    let value = e.target.value.replace(/,/g, "");
+    if (!isNaN(value)) {
+      setPaymentNumber(value.replace(/\B(?=(\d{3})+(?!\d))/g, ","));
+    }
+  };
 
   const handleSave = async () => {
     try {
-      const response = await api.post(`/api/payments/${paymentId}/feedback/`, {
-        status: status,
-        feedback: reason,
+      await api.patch(`/api/payments/${paymentId}/edit/`, {
+        status,
+        feedback,
+        comittee_name: paymentType || null,
+        amount: paymentNumber ? paymentNumber.replace(/,/g, "") : null,
       });
 
       Swal.fire({
         icon: "success",
-        title: "Feedback Saved",
-        text: "The payment status and feedback have been updated.",
-        timer: 2000,
-        showConfirmButton: false,
+        title: "Updated!",
+        text: "Payment details have been updated.",
+        confirmButtonColor: "#3085d6",
       });
 
-      if (onFeedbackSaved) {
-        onFeedbackSaved(response.data); // notify parent to refresh table if needed
-      }
-
+      if (onFeedbackSaved) onFeedbackSaved(); // ✅ refresh the payment table
       handleClose();
     } catch (error) {
       Swal.fire({
         icon: "error",
-        title: "Error",
-        text: error.response?.data?.detail || "Failed to save feedback.",
+        title: "Failed",
+        text: "Could not update payment. Please try again.",
+        confirmButtonColor: "#d33",
       });
     }
   };
@@ -74,31 +101,63 @@ function EditModal({ paymentId, onFeedbackSaved }) {
             p: 4,
           }}
         >
-          <h2 className="text-lg font-semibold">Edit Payment Status</h2>
+          <h2 className="text-lg font-semibold">Edit Payment</h2>
+
+          {/* Status */}
           <FormControl fullWidth sx={{ mt: 2 }}>
             <InputLabel>Status</InputLabel>
-            <Select value={status} label="Status" onChange={handleChange}>
-              <MenuItem value="Paid">Paid</MenuItem>
+            <Select
+              value={status}
+              label="Status"
+              onChange={(e) => setStatus(e.target.value)}
+            >
+              <MenuItem value="Accepted">Accepted</MenuItem>
               <MenuItem value="Pending">Pending</MenuItem>
-              <MenuItem value="Decline">Decline</MenuItem>
+              <MenuItem value="Rejected">Rejected</MenuItem>
             </Select>
           </FormControl>
 
+          {/* Feedback */}
           <TextField
             fullWidth
-            label="Reason (Optional)"
-            placeholder="e.g. Declined due to incorrect payment details"
+            label="Feedback"
+            placeholder="e.g. Payment declined due to incorrect details"
             variant="outlined"
-            value={reason}
-            onChange={(e) => setReason(e.target.value)}
+            value={feedback}
+            onChange={(e) => setFeedback(e.target.value)}
             sx={{ mt: 2 }}
             multiline
             minRows={2}
           />
-          <p className="text-xs text-orange-600 pt-1">
-            Enter the reason for this status so students will know.
-          </p>
 
+          {/* Payment Number */}
+          <TextField
+            fullWidth
+            label="Payment Amount"
+            placeholder="Enter amount"
+            value={paymentNumber}
+            onChange={handleNumberChange}
+            sx={{ mt: 2 }}
+          />
+
+          {/* Payment Type */}
+          <FormControl fullWidth sx={{ mt: 2 }}>
+            <InputLabel>Payment Type</InputLabel>
+            <Select
+              value={paymentType}
+              label="Payment Type"
+              onChange={(e) => setPaymentType(e.target.value)}
+            >
+              <MenuItem value="">None</MenuItem>
+              <MenuItem value="PTA">PTA</MenuItem>
+              <MenuItem value="QAA">QAA</MenuItem>
+              <MenuItem value="LAC">LAC</MenuItem>
+              <MenuItem value="CF">CF</MenuItem>
+              <MenuItem value="RHC">RHC</MenuItem>
+            </Select>
+          </FormControl>
+
+          {/* Action Buttons */}
           <Box
             sx={{ mt: 3, display: "flex", justifyContent: "flex-end", gap: 1 }}
           >

@@ -1,183 +1,167 @@
+/* eslint-disable no-unused-vars */
 import { useEffect, useState } from "react";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
-import { Link } from "react-router-dom";
 import EditModal from "../EditModal";
-import AddPayment from "./AddPayment";
 import api from "../../assets/api";
-import EditComittee from "./EditComittee";
 import Swal from "sweetalert2";
 
 function Table({ type }) {
   const [payments, setPayments] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const fetchPayments = async () => {
-    if (type !== "Dashboard") {
-      try {
-        setLoading(true);
-        const res = await api.get(`/api/payments/list/${type}/`);
-        setPayments(res.data);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
+    try {
+      const res = await api.get("/api/payments/");
+      setPayments(res.data);
+    } catch (error) {
+      Swal.fire("Error!", "Failed to fetch payments.", "error");
     }
   };
 
   useEffect(() => {
     fetchPayments();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [type]);
+  }, []);
 
-  const getDeadlineStatus = (deadline) => {
-    const today = new Date();
-    const deadlineDate = new Date(deadline);
-    const diffTime = deadlineDate - today;
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-    if (diffDays < 0)
-      return <span className="text-red-600 font-semibold">Deadline Ended</span>;
-    if (diffDays === 0)
-      return (
-        <span className="text-yellow-600 font-semibold">Deadline Today</span>
-      );
-    return (
-      <span className="text-green-600 font-medium">
-        {diffDays} day{diffDays > 1 ? "s" : ""} left
-      </span>
-    );
-  };
-
-  const handleDelete = async (id) => {
-    Swal.fire({
-      title: "Are you sure?",
-      text: "Deleting this committee will also remove all related payments.",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#3085d6",
-      confirmButtonText: "Yes, delete it!",
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        try {
-          await api.delete(`/api/committee/delete/${id}/`);
-          fetchPayments();
-          Swal.fire(
-            "Deleted!",
-            "Committee and payments have been removed.",
-            "success"
-          );
-        } catch (err) {
-          console.error(err);
-          Swal.fire("Error!", "Something went wrong while deleting.", "error");
-        }
+  useEffect(() => {
+    const fetchPayments = async () => {
+      try {
+        const response = await api.get(`/api/payment-type/${type}/`);
+        setPayments(response.data);
+      } catch (error) {
+        console.error("Error fetching payments:", error);
+        Swal.fire("Error", "Failed to fetch payments", "error");
+      } finally {
+        setLoading(false);
       }
-    });
-  };
+    };
+
+    if (type) fetchPayments();
+  }, [type]);
 
   if (loading) return <p className="text-center mt-6">Loading...</p>;
 
   return (
-    <>
-      <div className="flex flex-row items-center justify-between mt-12 mb-6">
-        <p className="font-bold">
-          {type === "Dashboard"
-            ? "Recent Payment Info"
-            : `${type} Payment Info`}
-        </p>
-        <AddPayment name={type} onSaved={fetchPayments} />
-      </div>
-
-      <div className="overflow-x-auto">
-        <table className="min-w-full bg-white">
-          <thead className="bg-gray-100 whitespace-nowrap">
-            <tr>
-              <th className="p-4 text-left text-[13px] font-semibold text-slate-900"></th>
+    <div className="overflow-x-auto">
+      <table className="min-w-full bg-white">
+        <thead className="bg-gray-100 whitespace-nowrap">
+          <tr>
+            <th className="p-4 text-left text-[13px] font-semibold text-slate-900">
+              Student
+            </th>
+            <th className="p-4 text-left text-[13px] font-semibold text-slate-900">
+              Comittee
+            </th>
+            <th className="p-4 text-left text-[13px] font-semibold text-slate-900">
+              Amount
+            </th>
+            <th className="p-4 text-left text-[13px] font-semibold text-slate-900">
+              Semester
+            </th>
+            <th className="p-4 text-left text-[13px] font-semibold text-slate-900">
+              Status
+            </th>
+            <th className="p-4 text-left text-[13px] font-semibold text-slate-900">
+              Feedback
+            </th>
+            <th className="p-4 text-left text-[13px] font-semibold text-slate-900">
+              Payment
+            </th>
+            <th className="p-4 text-left text-[13px] font-semibold text-slate-900">
+              Date Issued
+            </th>
+            {type !== "Dashboard" && (
               <th className="p-4 text-left text-[13px] font-semibold text-slate-900">
-                Details
+                Actions
               </th>
-              <th className="p-4 text-left text-[13px] font-semibold text-slate-900">
-                Amount
-              </th>
-              <th className="p-4 text-left text-[13px] font-semibold text-slate-900">
-                Deadline
-              </th>
-              {type !== "Dashboard" && (
-                <th className="p-4 text-left text-[13px] font-semibold text-slate-900">
-                  Actions
-                </th>
-              )}
-            </tr>
-          </thead>
-
-          <tbody className="whitespace-nowrap">
-            {payments.length === 0 ? (
-              <tr>
-                <td
-                  colSpan={type !== "Dashboard" ? 5 : 4}
-                  className="p-6 text-center text-slate-500 text-sm"
-                >
-                  No data available
-                </td>
-              </tr>
-            ) : (
-              payments.map((item) => (
-                <tr key={item.id} className="hover:bg-gray-50">
-                  <td className="p-4 text-[15px] text-slate-900 font-medium">
-                    <Link to={`/comittee/${item.id}/${type}`}> View</Link>
-                  </td>
-                  <td className="p-4 text-[15px] text-slate-600 font-medium">
-                    {item.details || "-"}
-                  </td>
-                  <td className="p-4 text-[15px] text-slate-600 font-medium">
-                    ₱{Number(item.amount).toLocaleString()}
-                  </td>
-                  <td className="p-4 text-[15px] text-slate-600 font-medium">
-                    <div className="flex-col">
-                      <p>
-                        {new Date(item.deadline)
-                          .toLocaleDateString("en-US", {
-                            month: "short",
-                            day: "numeric",
-                            year: "numeric",
-                          })
-                          .replace(",", ".")}
-                      </p>
-                      <p className="text-xs">
-                        {getDeadlineStatus(item.deadline)}
-                      </p>
-                    </div>
-                  </td>
-                  {type !== "Dashboard" && (
-                    <td className="p-4">
-                      <div className="flex items-center">
-                        <div
-                          className="mr-3 cursor-pointer"
-                          title="Edit Committee"
-                        >
-                          <EditComittee
-                            committee={item}
-                            onUpdated={fetchPayments}
-                          />
-                        </div>
-                        <button
-                          title="Delete"
-                          className="cursor-pointer"
-                          onClick={() => handleDelete(item.id)}
-                        >
-                          <DeleteOutlineIcon className="text-red-600 hover:scale-110 duration-300" />
-                        </button>
-                      </div>
-                    </td>
-                  )}
-                </tr>
-              ))
             )}
-          </tbody>
-        </table>
-      </div>
-    </>
+          </tr>
+        </thead>
+
+        <tbody className="whitespace-nowrap">
+          {payments.length === 0 ? (
+            <tr>
+              <td
+                colSpan={type !== "Dashboard" ? 9 : 8}
+                className="p-6 text-center text-slate-500 text-sm"
+              >
+                No data available
+              </td>
+            </tr>
+          ) : (
+            payments.map((item) => (
+              <tr key={item.id} className="hover:bg-gray-50">
+                <td className="p-4 text-[15px] text-slate-900 font-medium">
+                  {item.student?.first_name || "N/A"}
+                </td>
+                <td className="p-4 text-[15px] text-slate-600 font-medium">
+                  {item.comittee_name || "N/A"}
+                </td>
+                <td className="p-4 text-[15px] text-slate-600 font-medium">
+                  ₱{parseInt(item.amount || 0).toLocaleString()}
+                </td>
+                <td className="p-4 text-[15px] text-slate-600 font-medium">
+                  {item.semester || "N/A"}
+                </td>
+                <td className="p-4 text-[15px] text-slate-600 font-medium">
+                  {item.status || "Pending"}
+                </td>
+                <td className="p-4 text-[15px] text-slate-600 font-medium">
+                  {item.feedback || "N/A"}
+                </td>
+                <td className="p-4 text-[15px] text-slate-600 font-medium">
+                  {item.payment || "N/A"}
+                </td>
+                <td className="p-4 text-[15px] text-slate-600 font-medium">
+                  {item.date_issued
+                    ? new Date(item.date_issued).toLocaleDateString()
+                    : "N/A"}
+                </td>
+                {type !== "Dashboard" && (
+                  <td className="p-4 text-[15px] text-slate-600 font-medium flex gap-2">
+                    <EditModal
+                      paymentId={item.id}
+                      onFeedbackSaved={fetchPayments}
+                    />
+                    <DeleteOutlineIcon
+                      className="cursor-pointer text-red-500"
+                      onClick={() => {
+                        Swal.fire({
+                          title: "Are you sure?",
+                          text: "You won't be able to revert this!",
+                          icon: "warning",
+                          showCancelButton: true,
+                          confirmButtonText: "Yes, delete it!",
+                        }).then(async (result) => {
+                          if (result.isConfirmed) {
+                            try {
+                              await api.delete(`/payments/delete/${item.id}/`);
+                              setPayments(
+                                payments.filter((p) => p.id !== item.id)
+                              );
+                              Swal.fire(
+                                "Deleted!",
+                                "Payment has been deleted.",
+                                "success"
+                              );
+                            } catch (error) {
+                              Swal.fire(
+                                "Error",
+                                "Failed to delete payment",
+                                "error"
+                              );
+                            }
+                          }
+                        });
+                      }}
+                    />
+                  </td>
+                )}
+              </tr>
+            ))
+          )}
+        </tbody>
+      </table>
+    </div>
   );
 }
 
