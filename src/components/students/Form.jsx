@@ -11,6 +11,7 @@ function Form({ user, selected, semester }) {
   const [success, setSuccess] = useState("");
   const [committee, setCommittee] = useState(null);
   const [alreadySubmitted, setAlreadySubmitted] = useState(false);
+  const [amount, setAmount] = useState("");
 
   const fetchProfile = () => {
     if (user?.id) {
@@ -93,7 +94,8 @@ function Form({ user, selected, semester }) {
     !profile?.course ||
     !file ||
     error !== "" ||
-    loading;
+    loading ||
+    (selected === "partial" && (!amount || Number(amount) <= 0));
 
   const handleSubmit = async () => {
     if (isDisabled) return;
@@ -134,6 +136,21 @@ function Form({ user, selected, semester }) {
 
   return (
     <form className="mt-12" onSubmit={(e) => e.preventDefault()}>
+      {selected === "Partial" && (
+        <div className="mb-8">
+          <input
+            type="number"
+            placeholder="Enter Partial amount"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            className="px-4 py-3.5 bg-white text-slate-900 w-full text-sm border border-gray-200 rounded-md outline-0"
+          />
+          <p className="text-xs mt-1 text-orange-500 font-bold">
+            For Partial Payment, please specify the amount.
+          </p>
+        </div>
+      )}
+
       <div className="grid gap-4">
         <div>
           <input

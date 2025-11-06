@@ -9,33 +9,27 @@ function Table({ type }) {
   const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchPayments = async () => {
-    try {
-      const res = await api.get("/api/payments/");
-      setPayments(res.data);
-    } catch (error) {
-      Swal.fire("Error!", "Failed to fetch payments.", "error");
-    }
-  };
-
   useEffect(() => {
-    fetchPayments();
-  }, []);
+    setPayments([]);
+    setLoading(true);
 
-  useEffect(() => {
     const fetchPayments = async () => {
       try {
-        const response = await api.get(`/api/payment-type/${type}/`);
-        setPayments(response.data);
+        const url =
+          type === "Dashboard"
+            ? "/api/payments/"
+            : `/api/payment-type/${type}/`;
+
+        const res = await api.get(url);
+        setPayments(res.data);
       } catch (error) {
-        console.error("Error fetching payments:", error);
         Swal.fire("Error", "Failed to fetch payments", "error");
       } finally {
         setLoading(false);
       }
     };
 
-    if (type) fetchPayments();
+    fetchPayments();
   }, [type]);
 
   if (loading) return <p className="text-center mt-6">Loading...</p>;
@@ -120,7 +114,7 @@ function Table({ type }) {
                   <td className="p-4 text-[15px] text-slate-600 font-medium flex gap-2">
                     <EditModal
                       paymentId={item.id}
-                      onFeedbackSaved={fetchPayments}
+                      onFeedbackSaved={() => setPayments([])}
                     />
                     <DeleteOutlineIcon
                       className="cursor-pointer text-red-500"
@@ -139,11 +133,11 @@ function Table({ type }) {
                                 payments.filter((p) => p.id !== item.id)
                               );
                               Swal.fire(
-                                "Deleted!",
-                                "Payment has been deleted.",
+                                "Deleted",
+                                "Payment has been deleted",
                                 "success"
                               );
-                            } catch (error) {
+                            } catch {
                               Swal.fire(
                                 "Error",
                                 "Failed to delete payment",
