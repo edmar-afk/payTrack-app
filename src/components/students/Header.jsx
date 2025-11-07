@@ -22,8 +22,8 @@ function Header() {
         </div>
       </div>
       <Navbar/>
-      <div className="bg-gray-900 w-full p-12 pb-24">
-        <p className="text-white flex items-center">
+      <div className="bg-gray-900 w-full p-4 lg:p-12 pb-24">
+        <p className="text-white flex items-center mb-0 lg:mb-12 text-xs lg:text-xl">
           <InfoIcon fontSize="large" className="mr-3 animate-pulse" />
           Please make your payments carefully. Double-check the details to avoid
           sending money to the wrong category.

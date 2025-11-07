@@ -1,8 +1,10 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import api from "../../assets/api";
-
-function Form({ user, selected, semester }) {
+import CommitteesInfo from "./CommitteesInfo";
+import distributeAmount from "../../utils/distributeAmount";
+function Form({ user, selected, semester, schoolYear }) {
   const [profile, setProfile] = useState(null);
   const [file, setFile] = useState(null);
   const [error, setError] = useState("");
@@ -12,6 +14,30 @@ function Form({ user, selected, semester }) {
   const [committee, setCommittee] = useState(null);
   const [alreadySubmitted, setAlreadySubmitted] = useState(false);
   const [amount, setAmount] = useState("");
+  const [paymentExists, setPaymentExists] = useState(false);
+
+  const checkPaymentByYearSem = () => {
+    if (user?.id && semester && schoolYear) {
+      api
+        .get(
+          `/api/payment_filter/${user.id}/?school_year=${schoolYear}&semester=${semester}`
+        )
+        .then((res) => {
+          if (res.data.length > 0) setPaymentExists(true);
+          else setPaymentExists(false);
+        })
+        .catch(() => setPaymentExists(false));
+    }
+  };
+
+  useEffect(() => {
+    checkPaymentByYearSem();
+  }, [semester, schoolYear]);
+
+  const distribution = useMemo(() => {
+    if (selected !== "Partial" || !amount) return null;
+    return distributeAmount(Number(amount));
+  }, [selected, amount]);
 
   const fetchProfile = () => {
     if (user?.id) {
@@ -89,13 +115,16 @@ function Form({ user, selected, semester }) {
   };
 
   const isDisabled =
+    paymentExists ||
     alreadySubmitted ||
     !profile?.year_lvl ||
     !profile?.course ||
     !file ||
     error !== "" ||
     loading ||
-    (selected === "partial" && (!amount || Number(amount) <= 0));
+    !semester ||
+    !schoolYear ||
+    (selected === "Partial" && (!amount || Number(amount) <= 0));
 
   const handleSubmit = async () => {
     if (isDisabled) return;
@@ -108,6 +137,23 @@ function Form({ user, selected, semester }) {
       formData.append("proof", file);
       formData.append("payment", selected);
       formData.append("semester", semester || "");
+      formData.append("school_year", schoolYear || "");
+
+      if (distribution && selected === "Partial") {
+        formData.append("cf", distribution.CF.toFixed(2));
+        formData.append("lac", distribution.LAC.toFixed(2));
+        formData.append("pta", distribution.PTA.toFixed(2));
+        formData.append("qaa", distribution.QAA.toFixed(2));
+        formData.append("rhc", distribution.RHC.toFixed(2));
+      }
+
+      if (selected === "Full Pay") {
+        formData.append("cf", "100");
+        formData.append("lac", "100");
+        formData.append("pta", "150");
+        formData.append("qaa", "100");
+        formData.append("rhc", "100");
+      }
 
       await api.post(`/api/submit-payment/${user.id}/`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
@@ -118,7 +164,6 @@ function Form({ user, selected, semester }) {
       checkPayment();
     } catch (err) {
       setError("Failed to upload payment. Refreshing form...");
-      console.error(err);
       setTimeout(() => resetForm(), 1200);
     } finally {
       setLoading(false);
@@ -134,20 +179,57 @@ function Form({ user, selected, semester }) {
   //   semester
   // );
 
+  useEffect(() => {
+    if (selected !== "Partial") {
+      setAmount("");
+    }
+  }, [selected]);
+
   return (
     <form className="mt-12" onSubmit={(e) => e.preventDefault()}>
+      {paymentExists ? (
+        <div className="mb-8 -mt-10">
+          <p className="text-red-500 font-light text-xs">
+            You already submitted payment on this year and semester. Please
+            continue to pay remaining balance via payment history.
+          </p>
+        </div>
+      ) : alreadySubmitted ? (
+        <div className="mb-8 -mt-10">
+          <p className="text-red-500 font-bold text-xs">
+            You already submitted payment in this category. Please continue to
+            pay remaining balance via payment history.
+          </p>
+        </div>
+      ) : null}
+
       {selected === "Partial" && (
-        <div className="mb-8">
+        <div className="mb-8 relative">
+          <span className="absolute left-3 top-6.5 -translate-y-1/2 text-gray-500 font-bold">
+            ₱
+          </span>
+
           <input
             type="number"
             placeholder="Enter Partial amount"
             value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            className="px-4 py-3.5 bg-white text-slate-900 w-full text-sm border border-gray-200 rounded-md outline-0"
+            onChange={(e) => {
+              const val = Number(e.target.value);
+              if (val > 550) setAmount("550");
+              else setAmount(e.target.value);
+            }}
+            className="pl-8 px-4 py-3.5 bg-white text-slate-900 w-full text-sm border border-green-500 shadow-lg rounded-md outline-0"
           />
-          <p className="text-xs mt-1 text-orange-500 font-bold">
-            For Partial Payment, please specify the amount.
+
+          <p className="text-xs mt-2 text-orange-500 font-bold italic">
+            For Partial Payment, please specify the amount. Entered amount will
+            be evenly distributed to{" "}
+            <span className="text-blue-500">CF, LAC, PTA, QAA,</span> and{" "}
+            <span className="text-blue-500">RHC.</span> Please input amount
+            correctly to avoid rejections.
           </p>
+
+          <CommitteesInfo distribution={distribution} />
         </div>
       )}
 
@@ -263,12 +345,31 @@ function Form({ user, selected, semester }) {
             : "bg-purple-500 hover:bg-purple-600 text-white"
         }`}
       >
-        {alreadySubmitted
-          ? "You already submitted payment in this category"
+        {paymentExists
+          ? "Pay"
+          : alreadySubmitted
+          ? "Pay"
           : loading
           ? "Processing..."
           : "Pay"}
       </button>
+      {paymentExists ? (
+        <div className="mb-8 mt-2">
+          <p className="text-red-500 font-light text-xs">
+            You already submitted payment in this year and semester that has
+            Pending or already Completed. Please continue to pay remaining
+            balance via payment history.
+          </p>
+        </div>
+      ) : alreadySubmitted ? (
+        <div className="mb-8 -mt-10">
+          <p className="text-red-500 font-bold text-xs">
+            You already submitted payment in this year and semester that has
+            Pending or already Completed. Please continue to pay remaining
+            balance via payment history.
+          </p>
+        </div>
+      ) : null}
     </form>
   );
 }

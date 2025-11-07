@@ -8,13 +8,16 @@ function Dashboard() {
   const userInfo = getUserInfoFromToken(token);
   const [selected, setSelected] = useState("");
   const [selectedSemester, setSelectedSemester] = useState("");
+  const [selectedSchoolYear, setSelectedSchoolYear] = useState("");
+
   const payment = ["Partial", "Full Pay"];
   const semester = ["First Semester", "Second Semester"];
+  const schoolYear = ["2025-2026", "2026-2027", "2027-2028"];
 
   return (
     <>
-      <div className="bg-white p-4 -mt-14 w-[95%] mx-auto rounded-t-xl shadow-2xl">
-        <div className="px-24 mx-auto py-14">
+      <div className="bg-white p-4 -mt-14 w-full lg:w-[95%] mx-auto rounded-t-xl shadow-2xl">
+        <div className="px-0 lg:px-24 mx-auto py-14">
           <div className="flex flex-wrap justify-between">
             <div className="lg:col-span-2 max-md:order-1">
               <h2 className="text-3xl font-semibold text-slate-900">
@@ -89,10 +92,42 @@ function Dashboard() {
                   </div>
                 </div>
 
+                <div className="mt-8">
+                  <h3 className="text-lg font-semibold text-slate-900">
+                    Choose School Year
+                  </h3>
+                  <div className="flex flex-wrap gap-4 justify-start mt-6">
+                    {schoolYear.map((sy) => (
+                      <label
+                        key={sy}
+                        className={`flex items-center text-center rounded-sm w-[150px] cursor-pointer border 
+          ${
+            selectedSchoolYear === sy
+              ? "bg-green-700 border-green-700 text-white"
+              : "border-gray-600 text-gray-900 hover:bg-green-300 hover:border-green-700"
+          }`}
+                      >
+                        <input
+                          type="radio"
+                          value={sy}
+                          checked={selectedSchoolYear === sy}
+                          onChange={() => setSelectedSchoolYear(sy)}
+                          name="schoolYear"
+                          className="hidden"
+                        />
+                        <span className="w-full py-4 text-sm font-medium">
+                          {sy}
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
                 <Form
                   user={userInfo}
                   selected={selected}
                   semester={selectedSemester}
+                  schoolYear={selectedSchoolYear}
                 />
               </div>
             </div>
