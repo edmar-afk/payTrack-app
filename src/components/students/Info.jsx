@@ -10,6 +10,8 @@ import acceptedStamp from "../../assets/images/stamps/accepted.png";
 import declinedStamp from "../../assets/images/stamps/declined.png";
 import pendingStamp from "../../assets/images/stamps/pending.jpg";
 import FilterPayment from "./FilterPayment";
+import RemainingPaymentModal from "./RemainingPaymentModal";
+import ProofsModal from "./ProofsModal";
 function Info({ user }) {
   const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -67,9 +69,12 @@ function Info({ user }) {
   };
 
   console.log(payments);
+
+
+  
   return (
-    <div className="bg-gray-100 p-2 lg:p-6 rounded-md w-[350px] lg:w-[600px] mb-8 lg:mb-0">
-      <div className="lg:sticky lg:top-8">
+    <div className="bg-white lg:bg-gray-100 p-0 lg:p-6 rounded-md w-[350px] lg:w-[600px] mb-8 lg:mb-0">
+      <div>
         <div className="flex flex-row items-center justify-between">
           <h2 className="text-2xl font-semibold text-slate-900">
             Payment History
@@ -138,7 +143,7 @@ function Info({ user }) {
                   <span className="font-semibold mr-1">School Year:</span>
                   {p.school_year} - {p.semester}
                 </p>
-                <div className="flex flex-row gap-4 flex-wrap mt-3">
+                <div className="flex flex-row gap-4 flex-wrap mt-3 justify-between lg:justify-start">
                   {[
                     { label: "CF", value: p.cf, max: 100 },
                     { label: "LAC", value: p.lac, max: 100 },
@@ -152,7 +157,7 @@ function Info({ user }) {
                     return (
                       <div
                         key={item.label}
-                        className="w-full lg:w-fit p-5 mb-3 bg-white border border-gray-200 rounded-lg shadow-lg text-gray-500 font-bold"
+                        className="w-[140px] lg:w-[200px] p-5 mb-3 bg-white border border-gray-200 rounded-lg shadow-lg text-gray-500 font-bold"
                       >
                         {item.label}
                         <div>
@@ -160,8 +165,13 @@ function Info({ user }) {
                             ₱{paid.toLocaleString()}
                           </h5>
                           <p className="text-xs text-red-400">
-                            Remaining Pay ₱{Number(missing).toLocaleString()}{" "}
-                            Left
+                            {Number(missing) === 0 ? (
+                              <p className="text-green-600">Fully Paid</p>
+                            ) : (
+                              `Remaining Pay ₱${Number(
+                                missing
+                              ).toLocaleString()} Left`
+                            )}
                           </p>
                         </div>
                       </div>
@@ -174,19 +184,15 @@ function Info({ user }) {
                     {new Date(p.date_issued).toLocaleDateString()}
                   </p>{" "}
                   {p.proof && (
-                    <a
-                      href={p.proof}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-600 underline"
-                    >
-                      View Proof
-                    </a>
+                    <ProofsModal paymentId={p.id}/>
                   )}
                 </div>
-                <button className="bg-green-800 text-white py-1 px-4 rounded-lg mt-2">
-                  Pay Remaining Balance
-                </button>
+
+                <RemainingPaymentModal
+                  payment={p}
+                  schoolyear={schoolYear}
+                  semesters={semester}
+                />
 
                 {p.feedback && (
                   <div className="mt-3">

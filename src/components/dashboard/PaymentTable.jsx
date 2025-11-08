@@ -69,9 +69,7 @@ function PaymentTable() {
               <th className="p-4 text-left text-[13px] font-semibold text-slate-900">
                 Course
               </th>
-              <th className="p-4 text-left text-[13px] font-semibold text-slate-900">
-                Payment Type
-              </th>
+              
               <th className="p-4 text-left text-[13px] font-semibold text-slate-900">
                 Amount
               </th>
@@ -110,9 +108,7 @@ function PaymentTable() {
                     <td className="p-4 text-[15px] text-slate-600 font-medium">
                       {p.student?.profile?.course || "N/A"}
                     </td>
-                    <td className="p-4 text-[15px] text-slate-600 font-medium">
-                      {p.comittee_name || "No status yet"}
-                    </td>
+                    
 
                     <td className="p-4 text-[15px] text-slate-600 font-medium">
                       {p.amount && !isNaN(Number(p.amount))
@@ -127,6 +123,7 @@ function PaymentTable() {
                         student={p.student?.first_name}
                         imageUrl={p.proof}
                       />
+                      
                     </td>
                     <td className="p-4 text-[15px] text-slate-600 font-medium cursor-pointer">
                       {p.feedback ? (
