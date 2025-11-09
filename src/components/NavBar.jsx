@@ -47,7 +47,7 @@ function NavBar({ userInfo }) {
       </ul>
 
       {/* Payments Section */}
-      <p className="mt-12 mb-2 px-4 text-xs font-semibold text-gray-500 uppercase">
+      {/* <p className="mt-12 mb-2 px-4 text-xs font-semibold text-gray-500 uppercase">
         Payments
       </p>
       <ul className="space-y-1">
@@ -68,7 +68,7 @@ function NavBar({ userInfo }) {
             </NavLink>
           </li>
         ))}
-      </ul>
+      </ul> */}
 
       {/* Logout Link */}
       <ul className="mt-6 space-y-1">

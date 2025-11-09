@@ -131,17 +131,17 @@ function EditModal({ paymentId, onFeedbackSaved }) {
           />
 
           {/* Payment Number */}
-          <TextField
+          {/* <TextField
             fullWidth
             label="Payment Amount"
             placeholder="Enter amount"
             value={paymentNumber}
             onChange={handleNumberChange}
             sx={{ mt: 2 }}
-          />
+          /> */}
 
           {/* Payment Type */}
-          <FormControl fullWidth sx={{ mt: 2 }}>
+          {/* <FormControl fullWidth sx={{ mt: 2 }}>
             <InputLabel>Payment Type</InputLabel>
             <Select
               value={paymentType}
@@ -155,7 +155,7 @@ function EditModal({ paymentId, onFeedbackSaved }) {
               <MenuItem value="CF">CF</MenuItem>
               <MenuItem value="RHC">RHC</MenuItem>
             </Select>
-          </FormControl>
+          </FormControl> */}
 
           {/* Action Buttons */}
           <Box

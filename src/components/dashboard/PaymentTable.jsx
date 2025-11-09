@@ -6,7 +6,8 @@ import api from "../../assets/api";
 import ViewProof from "./ViewProof";
 import { Tooltip } from "@mui/material";
 import Swal from "sweetalert2";
-
+import CommitteesModal from "./CommitteesModal";
+import ProofsModal from "../students/ProofsModal";
 function PaymentTable() {
   const [payments, setPayments] = useState([]);
 
@@ -69,7 +70,9 @@ function PaymentTable() {
               <th className="p-4 text-left text-[13px] font-semibold text-slate-900">
                 Course
               </th>
-              
+              <th className="p-4 text-left text-[13px] font-semibold text-slate-900">
+                School Year - Semester
+              </th>
               <th className="p-4 text-left text-[13px] font-semibold text-slate-900">
                 Amount
               </th>
@@ -108,22 +111,14 @@ function PaymentTable() {
                     <td className="p-4 text-[15px] text-slate-600 font-medium">
                       {p.student?.profile?.course || "N/A"}
                     </td>
-                    
-
                     <td className="p-4 text-[15px] text-slate-600 font-medium">
-                      {p.amount && !isNaN(Number(p.amount))
-                        ? Number(p.amount).toLocaleString("en-US", {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2,
-                          })
-                        : "N/A"}
+                      {p.school_year || "N/A"} - {p.semester || "N/A"}
                     </td>
                     <td className="p-4 text-[15px] text-slate-600 font-medium">
-                      <ViewProof
-                        student={p.student?.first_name}
-                        imageUrl={p.proof}
-                      />
-                      
+                      <CommitteesModal paymentId={p.id} />
+                    </td>
+                    <td className="p-4 text-[15px] text-slate-600 font-medium">
+                      <ProofsModal paymentId={p.id} />
                     </td>
                     <td className="p-4 text-[15px] text-slate-600 font-medium cursor-pointer">
                       {p.feedback ? (
