@@ -4,6 +4,7 @@ import { useEffect, useState, useMemo } from "react";
 import api from "../../assets/api";
 import CommitteesInfo from "./CommitteesInfo";
 import distributeAmount from "../../utils/distributeAmount";
+import gcashLogo from "../../assets/images/gcash.png";
 function Form({ user, selected, semester, schoolYear }) {
   const [profile, setProfile] = useState(null);
   const [file, setFile] = useState(null);
@@ -332,6 +333,9 @@ function Form({ user, selected, semester, schoolYear }) {
               </p>
             )}
           </div>
+        </div>
+        <div className="flex flex-row items-center gap-8 border px-8 rounded-lg border-blue-600 bg-blue-100 text-blue-700 border-dashed">
+          <img src={gcashLogo} className="w-24" alt="" /> 09123456789
         </div>
       </div>
 

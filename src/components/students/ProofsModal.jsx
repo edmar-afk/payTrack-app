@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Modal, Box, Typography, IconButton } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import api from "../../assets/api";
-
+import DirectionsWalkIcon from "@mui/icons-material/DirectionsWalk";
 function ProofsModal({ paymentId }) {
   const [open, setOpen] = useState(false);
   const [mainProofs, setMainProofs] = useState([]);
@@ -40,28 +40,24 @@ function ProofsModal({ paymentId }) {
         className="flex items-center justify-center"
       >
         <Box className="bg-white rounded-2xl shadow-xl w-11/12 max-w-lg p-6 relative max-h-[80vh] overflow-y-auto">
-          <IconButton onClick={handleClose} className="absolute top-2 right-2">
-            <CloseIcon />
-          </IconButton>
-
           <div className="flex flex-col gap-4">
-            <Typography variant="h6" className="text-center font-bold">
-              Payment Proofs
-            </Typography>
-
-            <p className="font-semibold">Payment Proof</p>
+            <p className="font-semibold mt-7">Payment Proof</p>
             <div className="flex flex-col gap-3">
               {mainProofs.length === 0 ? (
-                <p className="text-gray-500 text-sm text-left">
-                  No Payment proof.
+                <p className="text-gray-500 flex flex-col items-center px-8 text-center text-xl">
+                  <DirectionsWalkIcon
+                    fontSize="large"
+                    className="text-gray-800"
+                  />{" "}
+                  This Payment is a Walk-In Student Payment. No proof available.
                 </p>
               ) : (
                 mainProofs.map((p) => (
                   <div
                     key={p.id}
-                    className="border p-2 rounded-lg flex items-center justify-center"
+                    className="border p-2 rounded-lg h-72 overflow-y-auto"
                   >
-                    <img src={p.proof} className="max-h-40 object-contain" />
+                    <img src={p.proof} className="w-full object-contain" />
                   </div>
                 ))
               )}

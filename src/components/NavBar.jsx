@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { NavLink } from "react-router-dom";
 import logo from "../assets/images/logo.png";
 
@@ -8,14 +9,19 @@ import PeopleIcon from "@mui/icons-material/People";
 import PaymentIcon from "@mui/icons-material/Payment";
 import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
 import LogoutIcon from "@mui/icons-material/Logout";
-
+import DirectionsWalkIcon from "@mui/icons-material/DirectionsWalk";
+import WalkInModal from "./dashboard/WalkInModal";
 function NavBar({ userInfo }) {
   const paymentItems = [
     { name: "PTA", path: "/pta", icon: <SchoolIcon fontSize="small" /> },
     { name: "QAA", path: "/qaa", icon: <AssignmentIcon fontSize="small" /> },
     { name: "LAC", path: "/lac", icon: <PeopleIcon fontSize="small" /> },
     { name: "CF", path: "/cf", icon: <PaymentIcon fontSize="small" /> },
-    { name: "RHC", path: "/rhc", icon: <AccountBalanceIcon fontSize="small" /> },
+    {
+      name: "RHC",
+      path: "/rhc",
+      icon: <AccountBalanceIcon fontSize="small" />,
+    },
   ];
 
   return (
@@ -43,6 +49,17 @@ function NavBar({ userInfo }) {
             </span>
             <span>Dashboard</span>
           </NavLink>
+        </li>
+        <li>
+          <div
+            to="/walk-in"
+            className="cursor-pointer text-slate-800 font-medium text-[15px] flex items-center rounded px-4 py-2 transition-all duration-300 hover:ml-2 hover:bg-gray-100"
+          >
+            <span className="mr-3">
+              <DirectionsWalkIcon fontSize="small" />
+            </span>
+            <span><WalkInModal/></span>
+          </div>
         </li>
       </ul>
 
