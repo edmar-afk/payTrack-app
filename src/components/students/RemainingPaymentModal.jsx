@@ -7,11 +7,11 @@ function RemainingPaymentModal({ payment, schoolyear, semesters }) {
   const [open, setOpen] = useState(false);
   const limits = { cf: 100, lac: 100, pta: 150, qaa: 100, rhc: 100 };
   const [form, setForm] = useState({
-    cf: limits.cf - (payment.cf || 0),
-    lac: limits.lac - (payment.lac || 0),
-    pta: limits.pta - (payment.pta || 0),
-    qaa: limits.qaa - (payment.qaa || 0),
-    rhc: limits.rhc - (payment.rhc || 0),
+    cf: 0,
+    lac: 0,
+    pta: 0,
+    qaa: 0,
+    rhc: 0,
   });
 
   const [proof, setProof] = useState(null);
