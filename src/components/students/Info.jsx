@@ -16,6 +16,7 @@ function Info({ user }) {
   const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [isWalkIn, setIsWalkIn] = useState("");
 
   const [semester, setSemester] = useState("First Semester");
   const [schoolYear, setSchoolYear] = useState("2025-2026");
@@ -25,7 +26,7 @@ function Info({ user }) {
     setLoading(true);
     try {
       const res = await api.get(
-        `/api/payment_filter/${user.id}/?semester=${semester}&school_year=${schoolYear}`
+        `/api/payment_filter/${user.id}/?semester=${semester}&school_year=${schoolYear}&is_walk_in=${isWalkIn}`
       );
 
       setPayments(res.data);
@@ -40,7 +41,7 @@ function Info({ user }) {
 
   useEffect(() => {
     fetchPayments();
-  }, [user, semester, schoolYear]);
+  }, [user, semester, schoolYear, isWalkIn]);
 
   useEffect(() => {
     fetchPayments();
@@ -70,8 +71,6 @@ function Info({ user }) {
 
   console.log(payments);
 
-
-  
   return (
     <div className="bg-white lg:bg-gray-100 p-0 lg:p-6 rounded-md w-[350px] lg:w-[600px] mb-8 lg:mb-0">
       <div>
@@ -93,6 +92,8 @@ function Info({ user }) {
           setSemester={setSemester}
           schoolYear={schoolYear}
           setSchoolYear={setSchoolYear}
+          isWalkIn={isWalkIn}
+          setIsWalkIn={setIsWalkIn}
         />
 
         {loading ? (
@@ -132,7 +133,7 @@ function Info({ user }) {
                 <div className="flex flex-row justify-between items-center">
                   <p>
                     <span className="font-semibold mr-1">Payment Method:</span>
-                    {p.payment}
+                    {p.payment ? p.payment : "Walk-In payment"}
                   </p>
 
                   <div className="flex items-center gap-2">
@@ -183,9 +184,7 @@ function Info({ user }) {
                     <span className="font-semibold">Date Issued:</span>{" "}
                     {new Date(p.date_issued).toLocaleDateString()}
                   </p>{" "}
-                  {p.proof && (
-                    <ProofsModal paymentId={p.id}/>
-                  )}
+                  {p.proof && <ProofsModal paymentId={p.id} />}
                 </div>
 
                 <RemainingPaymentModal

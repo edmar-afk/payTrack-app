@@ -7,9 +7,12 @@ import {
   Autocomplete,
   MenuItem,
   Grid,
+  FormControl,
+  InputLabel,
+  Select,
 } from "@mui/material";
 import api from "../../assets/api";
-
+import Swal from "sweetalert2";
 function WalkInModal() {
   const [open, setOpen] = useState(false);
   const [students, setStudents] = useState([]);
@@ -17,14 +20,25 @@ function WalkInModal() {
   const [formData, setFormData] = useState({
     proof: null,
     payment: "",
-    semester: "",
-    school_year: "",
+    semester: "1st Semester",
+    school_year: "2025-2026",
     cf: "",
     lac: "",
     pta: "",
     qaa: "",
     rhc: "",
+    is_walk_in: true,
   });
+
+  const isFormValid =
+    selectedUser &&
+    formData.semester &&
+    formData.school_year &&
+    formData.cf &&
+    formData.lac &&
+    formData.pta &&
+    formData.qaa &&
+    formData.rhc;
 
   useEffect(() => {
     api.get("/api/students/").then((res) => setStudents(res.data));
@@ -43,8 +57,23 @@ function WalkInModal() {
       .post(`/api/submit-payment/${selectedUser.id}/`, data, {
         headers: { "Content-Type": "multipart/form-data" },
       })
-      .then(() => setOpen(false))
-      .catch((err) => console.log(err.response?.data));
+      .then(() => {
+        Swal.fire({
+          icon: "success",
+          title: "Payment Submitted",
+          text: "The walk-in payment was successfully submitted.",
+          confirmButtonColor: "#3085d6",
+        });
+        setOpen(false);
+      })
+      .catch((err) => {
+        Swal.fire({
+          icon: "error",
+          title: "Submission Failed",
+          text: err.response?.data?.message || "Something went wrong.",
+          confirmButtonColor: "#d33",
+        });
+      });
   };
 
   const maxLimits = {
@@ -109,31 +138,38 @@ function WalkInModal() {
           />
 
           <Grid container spacing={2}>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                select
-                label="Semester"
-                fullWidth
-                value={formData.semester}
-                onChange={(e) =>
-                  setFormData({ ...formData, semester: e.target.value })
-                }
-              >
-                <MenuItem value="1st Semester">1st Semester</MenuItem>
-                <MenuItem value="2nd Semester">2nd Semester</MenuItem>
-              </TextField>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="School Year"
-                type="text"
-                value={formData.school_year}
-                onChange={(e) =>
-                  setFormData({ ...formData, school_year: e.target.value })
-                }
-              />
-            </Grid>
+            <div className="flex flex-row items-center justify-evenly gap-4 w-full">
+              <div className="flex flex-col flex-1">
+                <label>Semester</label>
+                <select
+                  className="border border-gray-400 py-4 px-3 w-full"
+                  name="semester"
+                  value={formData.semester}
+                  onChange={(e) =>
+                    setFormData({ ...formData, semester: e.target.value })
+                  }
+                >
+                  <option value="First Semester">1st Semester</option>
+                  <option value="Second Semester">2nd Semester</option>
+                </select>
+              </div>
+
+              <div className="flex flex-col flex-1">
+                <label>School Year</label>
+                <select
+                  className="border border-gray-400 py-4 px-3 w-full"
+                  name="school_year"
+                  value={formData.school_year}
+                  onChange={(e) =>
+                    setFormData({ ...formData, school_year: e.target.value })
+                  }
+                >
+                  <option value="2025-2026">2025-2026</option>
+                  <option value="2026-2027">2026-2027</option>
+                  <option value="2027-2028">2027-2028</option>
+                </select>
+              </div>
+            </div>
 
             <Grid item xs={12} sm={6}>
               <TextField
@@ -186,8 +222,14 @@ function WalkInModal() {
             variant="contained"
             fullWidth
             onClick={handleSubmit}
-            disabled={!selectedUser}
-            sx={{ mt: 2 }}
+            disabled={!isFormValid}
+            sx={{
+              mt: 2,
+              bgcolor: !isFormValid ? "red" : undefined,
+              "&:hover": {
+                bgcolor: !isFormValid ? "darkred" : undefined,
+              },
+            }}
           >
             Submit Payment
           </Button>

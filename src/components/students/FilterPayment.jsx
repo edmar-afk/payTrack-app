@@ -1,6 +1,13 @@
 import React from "react";
 
-function FilterPayment({ semester, setSemester, schoolYear, setSchoolYear }) {
+function FilterPayment({
+  semester,
+  setSemester,
+  schoolYear,
+  setSchoolYear,
+  isWalkIn,
+  setIsWalkIn,
+}) {
   return (
     <>
       <p className="mt-4">Filter Payments</p>
@@ -22,6 +29,15 @@ function FilterPayment({ semester, setSemester, schoolYear, setSchoolYear }) {
           <option value="2025-2026">2025-2026</option>
           <option value="2026-2027">2026-2027</option>
           <option value="2027-2028">2027-2028</option>
+        </select>
+
+        <select
+          value={isWalkIn}
+          onChange={(e) => setIsWalkIn(e.target.value)}
+          className="border rounded-md p-2 bg-white text-sm"
+        >
+          <option value="false">Online</option>
+          <option value="true">Walk-In</option>
         </select>
       </div>
     </>
