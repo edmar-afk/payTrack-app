@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import RestoreIcon from "@mui/icons-material/Restore";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
+import SummaryModal from "./SummaryModal";
 function Navbar() {
   return (
     <>
@@ -10,6 +11,7 @@ function Navbar() {
           <ExitToAppIcon fontSize="small" className="mr-1" />
           Logout
         </Link>
+        <SummaryModal/>
       </div>
     </>
   );
