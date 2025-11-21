@@ -16,7 +16,7 @@ function Info({ user }) {
   const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [isWalkIn, setIsWalkIn] = useState("");
+  const [isWalkIn, setIsWalkIn] = useState(false);
 
   const [semester, setSemester] = useState("First Semester");
   const [schoolYear, setSchoolYear] = useState("2025-2026");
