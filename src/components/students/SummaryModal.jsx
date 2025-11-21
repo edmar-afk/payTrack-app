@@ -56,7 +56,7 @@ function SummaryModal() {
                 <tr>
                   <th className="border px-4 py-2">Date Submitted</th>
                   <th className="border px-4 py-2">Total</th>
-                  <th className="border px-4 py-2">Semester</th>
+                  <th className="border px-4 py-2">School Year - Semester</th>
                   <th className="border px-4 py-2">Status</th>
                   <th className="border px-4 py-2">Payment Method</th>
                   <th className="border px-4 py-2">CF</th>
@@ -69,7 +69,7 @@ function SummaryModal() {
               </thead>
               <tbody>
                 {payments.map((p) => (
-                  <tr key={p.id} className="hover:bg-gray-50">
+                  <tr key={p.id} className="hover:bg-gray-50  text-center">
                     <td className="border px-4 py-2">
                       {new Date(p.date_issued).toLocaleDateString()}
                     </td>
@@ -84,7 +84,7 @@ function SummaryModal() {
                       ).toLocaleString()}
                     </td>
 
-                    <td className="border px-4 py-2">{p.semester || "-"}</td>
+                    <td className="border px-4 py-2">{p.school_year} - {p.semester || "-"}</td>
                     <td className="border px-4 py-2">{p.status}</td>
                     <td className="border px-4 py-2">
                       {p.payment || "Walk-In"}
