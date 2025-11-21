@@ -20,7 +20,7 @@ function WalkInModal() {
   const [formData, setFormData] = useState({
     proof: null,
     payment: "",
-    semester: "1st Semester",
+    semester: "First Semester",
     school_year: "2025-2026",
     cf: "",
     lac: "",
