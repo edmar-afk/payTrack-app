@@ -1,5 +1,9 @@
 /* eslint-disable no-unused-vars */
+import { useState } from "react";
 import { NavLink } from "react-router-dom";
+import { Drawer, IconButton, Box, useMediaQuery } from "@mui/material";
+import MenuIcon from "@mui/icons-material/Menu";
+
 import logo from "../assets/images/logo.png";
 
 import DashboardIcon from "@mui/icons-material/Dashboard";
@@ -10,8 +14,13 @@ import PaymentIcon from "@mui/icons-material/Payment";
 import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
 import LogoutIcon from "@mui/icons-material/Logout";
 import DirectionsWalkIcon from "@mui/icons-material/DirectionsWalk";
+
 import WalkInModal from "./dashboard/WalkInModal";
+
 function NavBar({ userInfo }) {
+  const [open, setOpen] = useState(false);
+  const isDesktop = useMediaQuery("(min-width: 768px)");
+
   const paymentItems = [
     { name: "PTA", path: "/pta", icon: <SchoolIcon fontSize="small" /> },
     { name: "QAA", path: "/qaa", icon: <AssignmentIcon fontSize="small" /> },
@@ -24,8 +33,8 @@ function NavBar({ userInfo }) {
     },
   ];
 
-  return (
-    <nav className="bg-white shadow-md border-r border-gray-200 h-screen fixed top-0 left-0 w-[250px] py-6 px-4 overflow-auto">
+  const SidebarContent = (
+    <nav className="bg-white shadow-md border-r border-gray-200 h-screen w-[250px] py-6 px-4 overflow-auto">
       <div className="flex flex-row items-center">
         <img src={logo} alt="logo" className="w-10 mr-2" />
         <p className="font-extrabold">PTA PayTrack</p>
@@ -50,15 +59,15 @@ function NavBar({ userInfo }) {
             <span>Dashboard</span>
           </NavLink>
         </li>
+
         <li>
-          <div
-            to="/walk-in"
-            className="cursor-pointer text-slate-800 font-medium text-[15px] flex items-center rounded px-4 py-2 transition-all duration-300 hover:ml-2 hover:bg-gray-100"
-          >
+          <div className="cursor-pointer text-slate-800 font-medium text-[15px] flex items-center rounded px-4 py-2 transition-all duration-300 hover:ml-2 hover:bg-gray-100">
             <span className="mr-3">
               <DirectionsWalkIcon fontSize="small" />
             </span>
-            <span><WalkInModal/></span>
+            <span>
+              <WalkInModal />
+            </span>
           </div>
         </li>
       </ul>
@@ -128,6 +137,28 @@ function NavBar({ userInfo }) {
         </p>
       </div>
     </nav>
+  );
+
+  return (
+    <>
+      {/* Mobile Toggle Button */}
+      {!isDesktop && (
+        <IconButton onClick={() => setOpen(true)} className="m-3">
+          <MenuIcon className="text-white" />
+        </IconButton>
+      )}
+
+      {/* Desktop Fixed Sidebar */}
+      {isDesktop ? (
+        <div className="fixed top-0 left-0">{SidebarContent}</div>
+      ) : (
+        <Drawer open={open} onClose={() => setOpen(false)} anchor="left">
+          <Drawer open={open} onClose={() => setOpen(false)} anchor="left">
+            <Box>{SidebarContent}</Box>
+          </Drawer>
+        </Drawer>
+      )}
+    </>
   );
 }
 

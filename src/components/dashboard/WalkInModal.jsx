@@ -110,7 +110,7 @@ function WalkInModal() {
             top: "50%",
             left: "50%",
             transform: "translate(-50%, -50%)",
-            width: { xs: 350, md: 600 },
+            width: { xs: 375, md: 600 },
             borderRadius: 2,
           }}
         >
