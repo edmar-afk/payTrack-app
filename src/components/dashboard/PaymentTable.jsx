@@ -8,9 +8,10 @@ import { Tooltip } from "@mui/material";
 import Swal from "sweetalert2";
 import CommitteesModal from "./CommitteesModal";
 import ProofsModal from "../students/ProofsModal";
+import Search from "../Search";
 function PaymentTable() {
   const [payments, setPayments] = useState([]);
-
+  const [searchTerm, setSearchTerm] = useState("");
   const fetchPayments = async () => {
     try {
       const res = await api.get("/api/payments/");
@@ -52,11 +53,34 @@ function PaymentTable() {
     });
   };
 
+  const filteredPayments = payments.filter((p) => {
+    const student = p.student?.first_name?.toLowerCase() || "";
+    const year = p.student?.profile?.year_lvl?.toLowerCase() || "";
+    const course = p.student?.profile?.course?.toLowerCase() || "";
+    const status = p.status?.toLowerCase() || "";
+    const sem = p.semester?.toLowerCase() || "";
+    const sy = p.school_year?.toLowerCase() || "";
+
+    return (
+      student.includes(searchTerm.toLowerCase()) ||
+      year.includes(searchTerm.toLowerCase()) ||
+      course.includes(searchTerm.toLowerCase()) ||
+      status.includes(searchTerm.toLowerCase()) ||
+      sem.includes(searchTerm.toLowerCase()) ||
+      sy.includes(searchTerm.toLowerCase())
+    );
+  });
+
   return (
     <>
       <p className="mt-12 font-bold mb-6">
         List of Students who submitted their Payments
       </p>
+      <Search
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+      />
+
       <div className="overflow-x-auto">
         <table className="min-w-full bg-white">
           <thead className="bg-gray-100 whitespace-nowrap">
@@ -92,73 +116,76 @@ function PaymentTable() {
           </thead>
 
           <tbody className="whitespace-nowrap">
-            {payments.length === 0 ? (
+            {filteredPayments.length === 0 && searchTerm !== "" ? (
+              <tr>
+                <td colSpan="9" className="p-4 text-center text-slate-500">
+                  No results found for '{searchTerm}'
+                </td>
+              </tr>
+            ) : filteredPayments.length === 0 ? (
               <tr>
                 <td colSpan="9" className="p-4 text-center text-slate-500">
                   No payments submitted yet.
                 </td>
               </tr>
             ) : (
-              payments.map((p) => {
-                return (
-                  <tr key={p.id} className="hover:bg-gray-50">
-                    <td className="p-4 text-[15px] text-slate-900 font-medium">
-                      {p.student?.first_name}
-                    </td>
-                    <td className="p-4 text-[15px] text-slate-600 font-medium">
-                      {p.student?.profile?.year_lvl || "N/A"}
-                    </td>
-                    <td className="p-4 text-[15px] text-slate-600 font-medium">
-                      {p.student?.profile?.course || "N/A"}
-                    </td>
-                    <td className="p-4 text-[15px] text-slate-600 font-medium">
-                      {p.school_year || "N/A"} - {p.semester || "N/A"}
-                    </td>
-                    <td className="p-4 text-[15px] text-slate-600 font-medium">
-                      <CommitteesModal paymentId={p.id} />
-                    </td>
-                    <td className="p-4 text-[15px] text-slate-600 font-medium">
-                      <ProofsModal paymentId={p.id} />
-                    </td>
-                    <td className="p-4 text-[15px] text-slate-600 font-medium cursor-pointer">
-                      {p.feedback ? (
-                        <Tooltip title={p.feedback} arrow placement="top">
-                          <span>{p.status || "No status yet"}</span>
-                        </Tooltip>
-                      ) : (
-                        "No feedback yet"
-                      )}
-                    </td>
-
-                    <td className="p-4 text-[15px] text-slate-600 font-medium">
-                      {p.date_issued
-                        ? new Date(p.date_issued).toLocaleDateString("en-US", {
-                            month: "short",
-                            day: "numeric",
-                            year: "numeric",
-                          })
-                        : ""}
-                    </td>
-                    <td className="p-4">
-                      <div className="flex items-center">
-                        <div className="mr-3 cursor-pointer" title="Edit">
-                          <EditModal
-                            paymentId={p.id}
-                            onFeedbackSaved={fetchPayments}
-                          />
-                        </div>
-                        <div
-                          className="cursor-pointer text-red-500"
-                          title="Delete"
-                          onClick={() => handleDelete(p.id)}
-                        >
-                          <DeleteOutlineIcon />
-                        </div>
+              filteredPayments.map((p) => (
+                <tr key={p.id} className="hover:bg-gray-50">
+                  <td className="p-4 text-[15px] text-slate-900 font-medium">
+                    {p.student?.first_name}
+                  </td>
+                  <td className="p-4 text-[15px] text-slate-600 font-medium">
+                    {p.student?.profile?.year_lvl || "N/A"}
+                  </td>
+                  <td className="p-4 text-[15px] text-slate-600 font-medium">
+                    {p.student?.profile?.course || "N/A"}
+                  </td>
+                  <td className="p-4 text-[15px] text-slate-600 font-medium">
+                    {p.school_year || "N/A"} - {p.semester || "N/A"}
+                  </td>
+                  <td className="p-4 text-[15px] text-slate-600 font-medium">
+                    <CommitteesModal paymentId={p.id} />
+                  </td>
+                  <td className="p-4 text-[15px] text-slate-600 font-medium">
+                    <ProofsModal paymentId={p.id} />
+                  </td>
+                  <td className="p-4 text-[15px] text-slate-600 font-medium cursor-pointer">
+                    {p.feedback ? (
+                      <Tooltip title={p.feedback} arrow placement="top">
+                        <span>{p.status || "No status yet"}</span>
+                      </Tooltip>
+                    ) : (
+                      "No feedback yet"
+                    )}
+                  </td>
+                  <td className="p-4 text-[15px] text-slate-600 font-medium">
+                    {p.date_issued
+                      ? new Date(p.date_issued).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        })
+                      : ""}
+                  </td>
+                  <td className="p-4">
+                    <div className="flex items-center">
+                      <div className="mr-3 cursor-pointer" title="Edit">
+                        <EditModal
+                          paymentId={p.id}
+                          onFeedbackSaved={fetchPayments}
+                        />
                       </div>
-                    </td>
-                  </tr>
-                );
-              })
+                      <div
+                        className="cursor-pointer text-red-500"
+                        title="Delete"
+                        onClick={() => handleDelete(p.id)}
+                      >
+                        <DeleteOutlineIcon />
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              ))
             )}
           </tbody>
         </table>
