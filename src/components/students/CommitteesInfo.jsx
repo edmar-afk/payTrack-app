@@ -9,6 +9,14 @@ function CommitteesInfo({ distribution }) {
     RHC: 100,
   };
 
+  const committeeLabels = {
+    PTA: "Parents Teacher Association",
+    QAA: "Quality Assurance Accreditation",
+    LAC: "Library Advisory Committee",
+    CF: "Contingency Fund",
+    RHC: "Registrar Clinic",
+  };
+
   return (
     <>
       <p className="mt-5 text-xs text-gray-500">
@@ -21,14 +29,17 @@ function CommitteesInfo({ distribution }) {
             key={name}
             className="w-fit p-5 bg-white border border-gray-200 rounded-lg shadow-lg text-gray-500 font-bold"
           >
-            {name}
+            {name} - <span className="text-xs text-green-800 font-extralight">{committeeLabels[name]}</span>
             <div>
               <h5 className="mb-1 text-xl font-semibold tracking-tight text-gray-900">
                 ₱{" "}
                 {distribution?.[name] ? distribution[name].toFixed(2) : "0.00"}
               </h5>
               <p className="text-xs text-gray-400">
-                Paid when reached <span className="text-blue-600">₱{committeeLimits[name]}.00</span>
+                Paid when reached{" "}
+                <span className="text-blue-600">
+                  ₱{committeeLimits[name]}.00
+                </span>
               </p>
             </div>
           </div>

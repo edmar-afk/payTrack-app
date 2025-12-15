@@ -146,11 +146,11 @@ function Info({ user }) {
                 </p>
                 <div className="flex flex-row gap-4 flex-wrap mt-3 justify-between lg:justify-start">
                   {[
-                    { label: "CF", value: p.cf, max: 100 },
-                    { label: "LAC", value: p.lac, max: 100 },
-                    { label: "PTA", value: p.pta, max: 150 },
-                    { label: "QAA", value: p.qaa, max: 100 },
-                    { label: "RHC", value: p.rhc, max: 100 },
+                    { label: "CF", subtitle:'Contendency fund', value: p.cf, max: 100 },
+                    { label: "LAC", subtitle:'Library Advisory Commity', value: p.lac, max: 100 },
+                    { label: "PTA", subtitle:'Parents Teacher Association', value: p.pta, max: 150 },
+                    { label: "QAA", subtitle:'Quality Assurance Accredatation', value: p.qaa, max: 100 },
+                    { label: "RHC", subtitle:'Regestral  Clinic', value: p.rhc, max: 100 },
                   ].map((item) => {
                     const paid = parseFloat(item.value) || 0;
                     const missing = Math.max(item.max - paid, 0).toFixed(2);
@@ -161,6 +161,7 @@ function Info({ user }) {
                         className="w-[140px] lg:w-[200px] p-5 mb-3 bg-white border border-gray-200 rounded-lg shadow-lg text-gray-500 font-bold"
                       >
                         {item.label}
+                        <p className="text-green-600 text-xs font-extralight">{item.subtitle}</p>
                         <div>
                           <h5 className="mb-1 text-xl font-semibold tracking-tight text-gray-900">
                             ₱{paid.toLocaleString()}

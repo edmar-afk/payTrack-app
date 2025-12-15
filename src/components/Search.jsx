@@ -2,7 +2,7 @@ import React from "react";
 
 function Search({ value, onChange }) {
   return (
-    <div className="flex px-4 py-3 rounded-md border-2 border-green-200 overflow-hidden max-w-md mb-4">
+    <div className="flex px-4 py-3 rounded-md border-2 border-green-200 overflow-hidden max-w-md">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 192.904 192.904"

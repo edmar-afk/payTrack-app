@@ -59,6 +59,10 @@ function EditModal({ paymentId, onFeedbackSaved }) {
         amount: paymentNumber ? paymentNumber.replace(/,/g, "") : null,
       });
 
+      if (status === "Rejected") {
+        await api.delete(`/api/payments/${paymentId}/remove-proof/`);
+      }
+
       Swal.fire({
         icon: "success",
         title: "Updated!",
@@ -66,7 +70,7 @@ function EditModal({ paymentId, onFeedbackSaved }) {
         confirmButtonColor: "#3085d6",
       });
 
-      if (onFeedbackSaved) onFeedbackSaved(); // ✅ refresh the payment table
+      if (onFeedbackSaved) onFeedbackSaved();
       handleClose();
     } catch (error) {
       Swal.fire({
@@ -104,7 +108,7 @@ function EditModal({ paymentId, onFeedbackSaved }) {
           <h2 className="text-lg font-semibold">Edit Payment</h2>
 
           {/* Status */}
-          <FormControl fullWidth sx={{ mt: 2 }}>
+          <FormControl fullWidth sx={{ mt: 2 }} required>
             <InputLabel>Status</InputLabel>
             <Select
               value={status}
@@ -113,7 +117,7 @@ function EditModal({ paymentId, onFeedbackSaved }) {
             >
               <MenuItem value="Accepted">Accepted</MenuItem>
               <MenuItem value="Pending">Pending</MenuItem>
-              <MenuItem value="Rejected">Rejected</MenuItem>
+              <MenuItem value="Pending">Rejected</MenuItem>
             </Select>
           </FormControl>
 
@@ -128,7 +132,13 @@ function EditModal({ paymentId, onFeedbackSaved }) {
             sx={{ mt: 2 }}
             multiline
             minRows={2}
+            required
           />
+          {status === "Rejected" && (
+            <p className="mt-2 text-sm text-red-600">
+              If this payment is rejected, its payment proofs will be removed and returned it to Pending.
+            </p>
+          )}
 
           {/* Payment Number */}
           {/* <TextField
